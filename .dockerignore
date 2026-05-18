@@ -1,0 +1,9 @@
+.git
+__pycache__/
+*.pyc
+.pytest_cache/
+.coverage
+htmlcov/
+staticfiles/
+media/
+postgres_data/
