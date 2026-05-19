@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}PsiLine | Atendimento Psicologico{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="hero-copy">
+    <span class="eyebrow">Gestao clinica para atendimentos remotos</span>
+    <h1>Atendimento psicologico remoto com organizacao de ambiente hospitalar.</h1>
+    <p>
+      O PsiLine centraliza pacientes, estagiarios e consultas em uma plataforma
+      segura para equipes academicas e administrativas acompanharem a rotina de cuidado.
+    </p>
+    <div class="hero-actions">
+      <a class="primary-action" href="{% url 'frontend-login' %}">Acessar o sistema</a>
+      <a class="secondary-action" href="/api/">Ver API</a>
+    </div>
+  </div>
+  <aside class="clinic-panel" aria-label="Resumo operacional">
+    <div class="panel-header">
+      <span class="status-dot"></span>
+      <strong>Central de Atendimento</strong>
+    </div>
+    <div class="metric-grid">
+      <div>
+        <span>Triagem</span>
+        <strong>Online</strong>
+      </div>
+      <div>
+        <span>Agenda</span>
+        <strong>Integrada</strong>
+      </div>
+      <div>
+        <span>Seguranca</span>
+        <strong>JWT</strong>
+      </div>
+      <div>
+        <span>Gestao</span>
+        <strong>Admin</strong>
+      </div>
+    </div>
+  </aside>
+</section>
+
+<section class="service-band" aria-label="Recursos principais">
+  <article>
+    <span class="feature-icon">01</span>
+    <h2>Pacientes organizados</h2>
+    <p>Cadastro com dados essenciais, status ativo e historico preparado para evolucao.</p>
+  </article>
+  <article>
+    <span class="feature-icon">02</span>
+    <h2>Estagiarios com acesso</h2>
+    <p>Login por matricula, papel definido e acesso restrito a agenda individual.</p>
+  </article>
+  <article>
+    <span class="feature-icon">03</span>
+    <h2>Consultas protegidas</h2>
+    <p>Agenda valida conflitos, bloqueia inativos e registra link da sala remota.</p>
+  </article>
+</section>
+{% endblock %}

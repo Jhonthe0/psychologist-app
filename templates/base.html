@@ -1,0 +1,34 @@
+{% load static %}
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}PsiLine{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="{% url 'home' %}" aria-label="PsiLine inicio">
+      <span class="brand-mark">P</span>
+      <span>
+        <strong>PsiLine</strong>
+        <small>Clinica Escola Digital</small>
+      </span>
+    </a>
+    <nav class="top-nav" aria-label="Navegacao principal">
+      <a href="{% url 'home' %}">Inicio</a>
+      <a href="/api/">API</a>
+      <a href="/admin/">Admin</a>
+      <a class="nav-button" href="{% url 'frontend-login' %}">Entrar</a>
+    </nav>
+  </header>
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

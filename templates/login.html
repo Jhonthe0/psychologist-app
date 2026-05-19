@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}PsiLine | Entrar{% endblock %}
+
+{% block content %}
+<section class="login-shell">
+  <div class="login-card">
+    <span class="eyebrow">Entrada segura</span>
+    <h1>Acessar o sistema</h1>
+    <p>
+      Nesta etapa, o acesso operacional usa o Django Admin e a API autenticada.
+      A tela visual de login fica pronta para receber o fluxo completo no proximo commit.
+    </p>
+
+    <div class="access-list">
+      <a href="/admin/">
+        <span>Django Admin</span>
+        <strong>Gerenciar pacientes, estagiarios e consultas</strong>
+      </a>
+      <a href="/api/auth/token/">
+        <span>Token JWT</span>
+        <strong>Autenticar clientes da API</strong>
+      </a>
+    </div>
+  </div>
+
+  <aside class="care-note">
+    <strong>PsiLine</strong>
+    <p>Interface institucional para rotinas de cuidado psicologico remoto.</p>
+  </aside>
+</section>
+{% endblock %}

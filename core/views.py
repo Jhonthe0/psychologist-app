@@ -1,4 +1,5 @@
 from django.utils import timezone
+from django.views.generic import TemplateView
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -13,6 +14,14 @@ from core.serializers import (
     RoleTokenObtainPairSerializer,
     TraineeSerializer,
 )
+
+
+class HomeView(TemplateView):
+    template_name = "home.html"
+
+
+class LoginView(TemplateView):
+    template_name = "login.html"
 
 
 class RoleTokenObtainPairView(TokenObtainPairView):

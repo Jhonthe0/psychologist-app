@@ -8,6 +8,22 @@ from rest_framework.test import APITestCase
 from core.models import Appointment, Patient, Trainee, User
 
 
+class FrontendPageTests(APITestCase):
+    def test_home_page_renders_public_hospital_interface(self):
+        response = self.client.get("/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertContains(response, "PsiLine")
+        self.assertContains(response, "Atendimento psicologico remoto")
+
+    def test_login_page_renders_entry_interface(self):
+        response = self.client.get("/login/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertContains(response, "Acessar o sistema")
+        self.assertContains(response, "Django Admin")
+
+
 class AdminApiTests(APITestCase):
     def setUp(self):
         self.admin = get_user_model().objects.create_user(
