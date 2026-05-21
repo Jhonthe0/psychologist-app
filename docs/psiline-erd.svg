@@ -1,0 +1,143 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="980" viewBox="0 0 1440 980">
+  <defs>
+    <style>
+      .bg { fill: #f8fafc; }
+      .title { font: 700 30px Arial, sans-serif; fill: #0f172a; }
+      .subtitle { font: 400 15px Arial, sans-serif; fill: #475569; }
+      .table { fill: #ffffff; stroke: #334155; stroke-width: 1.5; rx: 10; }
+      .head-user { fill: #2563eb; }
+      .head-domain { fill: #0f766e; }
+      .head-event { fill: #7c3aed; }
+      .head-text { font: 700 17px Arial, sans-serif; fill: #ffffff; }
+      .section { font: 700 12px Arial, sans-serif; fill: #64748b; }
+      .field { font: 14px Arial, sans-serif; fill: #0f172a; }
+      .field-muted { font: 14px Arial, sans-serif; fill: #475569; }
+      .pk { font: 700 14px Arial, sans-serif; fill: #0f172a; }
+      .key { font: 700 12px Arial, sans-serif; fill: #2563eb; }
+      .rel { stroke: #0f172a; stroke-width: 2.2; fill: none; marker-end: url(#arrow); }
+      .rel-opt { stroke: #64748b; stroke-width: 2.2; fill: none; stroke-dasharray: 8 7; marker-end: url(#arrow-muted); }
+      .label-bg { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 1; rx: 5; }
+      .label { font: 700 13px Arial, sans-serif; fill: #334155; }
+      .note { fill: #ecfeff; stroke: #0891b2; stroke-width: 1.2; rx: 10; }
+      .note-title { font: 700 14px Arial, sans-serif; fill: #164e63; }
+      .note-text { font: 13px Arial, sans-serif; fill: #164e63; }
+    </style>
+    <marker id="arrow" markerWidth="11" markerHeight="11" refX="9" refY="3.5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,7 L10,3.5 z" fill="#0f172a" />
+    </marker>
+    <marker id="arrow-muted" markerWidth="11" markerHeight="11" refX="9" refY="3.5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,7 L10,3.5 z" fill="#64748b" />
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1440" height="980" />
+
+  <text class="title" x="56" y="54">PsiLine - Diagrama Relacional</text>
+  <text class="subtitle" x="56" y="82">Tabelas principais, atributos e relacionamentos implementados no backend Django</text>
+
+  <!-- core_user -->
+  <g id="user" transform="translate(500 120)">
+    <rect class="table" x="0" y="0" width="440" height="330" />
+    <rect class="head-user" x="0" y="0" width="440" height="48" rx="10" />
+    <path d="M0 38 H440 V48 H0 Z" fill="#2563eb" />
+    <text class="head-text" x="22" y="31">core_user</text>
+
+    <text class="section" x="22" y="76">IDENTIDADE</text>
+    <text class="pk" x="22" y="102">PK id: bigint</text>
+    <text class="field" x="22" y="128">username: varchar(150), unique</text>
+    <text class="field" x="22" y="154">email: email, unique</text>
+    <text class="field" x="22" y="180">password: varchar(128)</text>
+
+    <text class="section" x="22" y="218">PERMISSOES</text>
+    <text class="field" x="22" y="244">role: admin | trainee | patient</text>
+    <text class="field" x="22" y="270">is_active: boolean</text>
+    <text class="field" x="22" y="296">is_staff: boolean</text>
+    <text class="field" x="22" y="322">is_superuser: boolean</text>
+  </g>
+
+  <!-- core_patient -->
+  <g id="patient" transform="translate(76 560)">
+    <rect class="table" x="0" y="0" width="360" height="300" />
+    <rect class="head-domain" x="0" y="0" width="360" height="48" rx="10" />
+    <path d="M0 38 H360 V48 H0 Z" fill="#0f766e" />
+    <text class="head-text" x="22" y="31">core_patient</text>
+
+    <text class="section" x="22" y="76">CHAVES</text>
+    <text class="pk" x="22" y="102">PK id: bigint</text>
+    <text class="field-muted" x="22" y="128">FK user_id: bigint, nullable, unique</text>
+
+    <text class="section" x="22" y="166">DADOS</text>
+    <text class="field" x="22" y="192">name: varchar(255)</text>
+    <text class="field" x="22" y="218">cpf: varchar(14), unique</text>
+    <text class="field" x="22" y="244">email: email, unique</text>
+    <text class="field" x="22" y="270">phone: varchar(20)</text>
+  </g>
+
+  <!-- core_trainee -->
+  <g id="trainee" transform="translate(1004 560)">
+    <rect class="table" x="0" y="0" width="360" height="300" />
+    <rect class="head-domain" x="0" y="0" width="360" height="48" rx="10" />
+    <path d="M0 38 H360 V48 H0 Z" fill="#0f766e" />
+    <text class="head-text" x="22" y="31">core_trainee</text>
+
+    <text class="section" x="22" y="76">CHAVES</text>
+    <text class="pk" x="22" y="102">PK id: bigint</text>
+    <text class="field" x="22" y="128">FK user_id: bigint, unique</text>
+
+    <text class="section" x="22" y="166">DADOS</text>
+    <text class="field" x="22" y="192">registration_number: varchar(50), unique</text>
+    <text class="field" x="22" y="218">phone: varchar(20)</text>
+    <text class="field" x="22" y="244">active: boolean</text>
+    <text class="field" x="22" y="270">created_at / updated_at: datetime</text>
+  </g>
+
+  <!-- core_appointment -->
+  <g id="appointment" transform="translate(510 570)">
+    <rect class="table" x="0" y="0" width="420" height="330" />
+    <rect class="head-event" x="0" y="0" width="420" height="48" rx="10" />
+    <path d="M0 38 H420 V48 H0 Z" fill="#7c3aed" />
+    <text class="head-text" x="22" y="31">core_appointment</text>
+
+    <text class="section" x="22" y="76">CHAVES</text>
+    <text class="pk" x="22" y="102">PK id: bigint</text>
+    <text class="field" x="22" y="128">FK trainee_id: bigint</text>
+    <text class="field" x="22" y="154">FK patient_id: bigint</text>
+
+    <text class="section" x="22" y="192">ATENDIMENTO</text>
+    <text class="field" x="22" y="218">scheduled_at: datetime</text>
+    <text class="field" x="22" y="244">call_link: url, blank</text>
+    <text class="field" x="22" y="270">status: scheduled | completed | canceled</text>
+    <text class="field" x="22" y="296">active: boolean</text>
+    <text class="field" x="22" y="322">created_at / updated_at: datetime</text>
+  </g>
+
+  <!-- Relationship paths routed around boxes -->
+  <path class="rel-opt" d="M500 296 H320 C260 296 230 346 230 560" />
+  <rect class="label-bg" x="224" y="372" width="200" height="28" />
+  <text class="label" x="240" y="391">User 0..1 -> 0..1 Patient</text>
+
+  <path class="rel" d="M940 296 H1120 C1180 296 1184 346 1184 560" />
+  <rect class="label-bg" x="1014" y="372" width="180" height="28" />
+  <text class="label" x="1030" y="391">User 1 -> 1 Trainee</text>
+
+  <path class="rel" d="M436 710 H510" />
+  <rect class="label-bg" x="382" y="672" width="180" height="28" />
+  <text class="label" x="398" y="691">Patient 1 -> N Consulta</text>
+
+  <path class="rel" d="M1004 710 H930" />
+  <rect class="label-bg" x="884" y="672" width="188" height="28" />
+  <text class="label" x="900" y="691">Trainee 1 -> N Consulta</text>
+
+  <!-- Relationship field anchors -->
+  <text class="key" x="444" y="706">patient_id</text>
+  <text class="key" x="942" y="706">trainee_id</text>
+  <text class="key" x="324" y="292">user_id</text>
+  <text class="key" x="1118" y="292">user_id</text>
+
+  <!-- Note -->
+  <g transform="translate(76 918)">
+    <rect class="note" x="0" y="0" width="1288" height="44" />
+    <text class="note-title" x="18" y="18">Notas de modelagem</text>
+    <text class="note-text" x="18" y="36">Admin nao possui tabela propria: e um core_user com role=admin/is_staff. Patient.user e opcional porque paciente nao faz login na primeira versao.</text>
+  </g>
+</svg>
