@@ -1,0 +1,42 @@
+{% extends "app/base_app.html" %}
+
+{% block title %}PsiLine | Estagiarios{% endblock %}
+
+{% block app_content %}
+<header class="page-heading">
+  <span class="eyebrow">Equipe de atendimento</span>
+  <h2>Estagiarios</h2>
+  <p>Controle visual dos estagiarios com login ativo no PsiLine.</p>
+</header>
+
+<section class="clinical-section">
+  <div class="data-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Matricula</th>
+          <th>Email</th>
+          <th>Telefone</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for trainee in trainees %}
+          <tr>
+            <td>{{ trainee.full_name }}</td>
+            <td>{{ trainee.registration_number }}</td>
+            <td>{{ trainee.email }}</td>
+            <td>{{ trainee.phone }}</td>
+            <td><span class="status-badge">{{ trainee.active|yesno:"Ativo,Inativo" }}</span></td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="5">Nenhum estagiario cadastrado.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

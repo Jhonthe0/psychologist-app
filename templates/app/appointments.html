@@ -1,0 +1,48 @@
+{% extends "app/base_app.html" %}
+
+{% block title %}PsiLine | Consultas{% endblock %}
+
+{% block app_content %}
+<header class="page-heading">
+  <span class="eyebrow">Agenda institucional</span>
+  <h2>Consultas</h2>
+  <p>Visao administrativa de atendimentos agendados, realizados e cancelados.</p>
+</header>
+
+<section class="clinical-section">
+  <div class="data-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Data e hora</th>
+          <th>Paciente</th>
+          <th>Estagiario</th>
+          <th>Link</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for appointment in appointments %}
+          <tr>
+            <td>{{ appointment.scheduled_at|date:"d/m/Y H:i" }}</td>
+            <td>{{ appointment.patient.name }}</td>
+            <td>{{ appointment.trainee.full_name }}</td>
+            <td>
+              {% if appointment.call_link %}
+                <a href="{{ appointment.call_link }}">Sala online</a>
+              {% else %}
+                Aguardando link
+              {% endif %}
+            </td>
+            <td><span class="status-badge">{{ appointment.get_status_display }}</span></td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="5">Nenhuma consulta cadastrada.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

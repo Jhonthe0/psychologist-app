@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="app-shell">
+  <aside class="app-sidebar" aria-label="Navegacao do sistema">
+    <span class="eyebrow">Operacao clinica</span>
+    <h1>PsiLine</h1>
+    <nav>
+      {% if request.user.is_staff or request.user.role == "admin" %}
+        <a href="{% url 'app-dashboard' %}">Painel</a>
+        <a href="{% url 'app-patients' %}">Pacientes</a>
+        <a href="{% url 'app-trainees' %}">Estagiarios</a>
+        <a href="{% url 'app-appointments' %}">Consultas</a>
+      {% endif %}
+      {% if request.user.role == "trainee" %}
+        <a href="{% url 'app-agenda' %}">Minha agenda</a>
+      {% endif %}
+    </nav>
+  </aside>
+
+  <div class="app-main">
+    {% block app_content %}{% endblock %}
+  </div>
+</section>
+{% endblock %}

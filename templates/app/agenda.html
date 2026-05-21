@@ -1,0 +1,46 @@
+{% extends "app/base_app.html" %}
+
+{% block title %}PsiLine | Minha agenda{% endblock %}
+
+{% block app_content %}
+<header class="page-heading">
+  <span class="eyebrow">Ambiente do estagiario</span>
+  <h2>Minha agenda</h2>
+  <p>Consultas futuras vinculadas ao seu usuario de atendimento.</p>
+</header>
+
+<section class="clinical-section">
+  <div class="data-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Data e hora</th>
+          <th>Paciente</th>
+          <th>Telefone</th>
+          <th>Link da reuniao</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for appointment in appointments %}
+          <tr>
+            <td>{{ appointment.scheduled_at|date:"d/m/Y H:i" }}</td>
+            <td>{{ appointment.patient.name }}</td>
+            <td>{{ appointment.patient.phone }}</td>
+            <td>
+              {% if appointment.call_link %}
+                <a href="{{ appointment.call_link }}">Abrir sala</a>
+              {% else %}
+                Aguardando link
+              {% endif %}
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="4">Voce nao possui consultas futuras agendadas.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

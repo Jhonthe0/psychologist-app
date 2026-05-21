@@ -1,0 +1,42 @@
+{% extends "app/base_app.html" %}
+
+{% block title %}PsiLine | Pacientes{% endblock %}
+
+{% block app_content %}
+<header class="page-heading">
+  <span class="eyebrow">Cadastro assistencial</span>
+  <h2>Pacientes</h2>
+  <p>Lista operacional dos pacientes cadastrados no sistema.</p>
+</header>
+
+<section class="clinical-section">
+  <div class="data-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>CPF</th>
+          <th>Email</th>
+          <th>Telefone</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for patient in patients %}
+          <tr>
+            <td>{{ patient.name }}</td>
+            <td>{{ patient.cpf }}</td>
+            <td>{{ patient.email }}</td>
+            <td>{{ patient.phone }}</td>
+            <td><span class="status-badge">{{ patient.active|yesno:"Ativo,Inativo" }}</span></td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="5">Nenhum paciente cadastrado.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

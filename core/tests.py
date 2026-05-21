@@ -23,6 +23,146 @@ class FrontendPageTests(APITestCase):
         self.assertContains(response, "Acessar o sistema")
         self.assertContains(response, "Django Admin")
 
+    def test_admin_dashboard_renders_operational_metrics(self):
+        admin = get_user_model().objects.create_user(
+            username="admin",
+            email="admin@example.com",
+            password="StrongPass123!",
+            role=User.Role.ADMIN,
+            is_staff=True,
+        )
+        patient = Patient.objects.create(
+            name="Maria Silva",
+            cpf="12345678900",
+            email="maria@example.com",
+            phone="35999999999",
+        )
+        trainee_user = get_user_model().objects.create_user(
+            username="20250001",
+            email="joao@example.com",
+            password="StrongPass123!",
+            role=User.Role.TRAINEE,
+            first_name="Joao",
+            last_name="Pereira",
+        )
+        trainee = Trainee.objects.create(
+            user=trainee_user,
+            registration_number="20250001",
+            phone="35988888888",
+        )
+        Appointment.objects.create(
+            patient=patient,
+            trainee=trainee,
+            scheduled_at=timezone.now() + timedelta(days=1),
+        )
+
+        self.client.force_login(admin)
+        response = self.client.get("/app/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertContains(response, "Painel clinico")
+        self.assertContains(response, "Pacientes ativos")
+        self.assertContains(response, "Maria Silva")
+
+    def test_admin_list_pages_render_registered_records(self):
+        admin = get_user_model().objects.create_user(
+            username="admin",
+            email="admin@example.com",
+            password="StrongPass123!",
+            role=User.Role.ADMIN,
+            is_staff=True,
+        )
+        patient = Patient.objects.create(
+            name="Maria Silva",
+            cpf="12345678900",
+            email="maria@example.com",
+            phone="35999999999",
+        )
+        trainee_user = get_user_model().objects.create_user(
+            username="20250001",
+            email="joao@example.com",
+            password="StrongPass123!",
+            role=User.Role.TRAINEE,
+            first_name="Joao",
+            last_name="Pereira",
+        )
+        trainee = Trainee.objects.create(
+            user=trainee_user,
+            registration_number="20250001",
+            phone="35988888888",
+        )
+        Appointment.objects.create(
+            patient=patient,
+            trainee=trainee,
+            scheduled_at=timezone.now() + timedelta(days=1),
+        )
+
+        self.client.force_login(admin)
+
+        patient_response = self.client.get("/app/patients/")
+        trainee_response = self.client.get("/app/trainees/")
+        appointment_response = self.client.get("/app/appointments/")
+
+        self.assertContains(patient_response, "Maria Silva")
+        self.assertContains(trainee_response, "Joao")
+        self.assertContains(appointment_response, "Agendada")
+
+    def test_trainee_agenda_page_only_renders_own_future_appointments(self):
+        patient = Patient.objects.create(
+            name="Maria Silva",
+            cpf="12345678900",
+            email="maria@example.com",
+            phone="35999999999",
+        )
+        other_patient = Patient.objects.create(
+            name="Ana Costa",
+            cpf="98765432100",
+            email="ana@example.com",
+            phone="35977777777",
+        )
+        trainee_user = get_user_model().objects.create_user(
+            username="20250001",
+            email="joao@example.com",
+            password="StrongPass123!",
+            role=User.Role.TRAINEE,
+            first_name="Joao",
+            last_name="Pereira",
+        )
+        trainee = Trainee.objects.create(
+            user=trainee_user,
+            registration_number="20250001",
+            phone="35988888888",
+        )
+        other_user = get_user_model().objects.create_user(
+            username="20250002",
+            email="clara@example.com",
+            password="StrongPass123!",
+            role=User.Role.TRAINEE,
+        )
+        other_trainee = Trainee.objects.create(
+            user=other_user,
+            registration_number="20250002",
+            phone="35966666666",
+        )
+        Appointment.objects.create(
+            patient=patient,
+            trainee=trainee,
+            scheduled_at=timezone.now() + timedelta(days=1),
+        )
+        Appointment.objects.create(
+            patient=other_patient,
+            trainee=other_trainee,
+            scheduled_at=timezone.now() + timedelta(days=1),
+        )
+
+        self.client.force_login(trainee_user)
+        response = self.client.get("/app/agenda/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertContains(response, "Minha agenda")
+        self.assertContains(response, "Maria Silva")
+        self.assertNotContains(response, "Ana Costa")
+
 
 class AdminApiTests(APITestCase):
     def setUp(self):

@@ -1,4 +1,5 @@
 from django.utils import timezone
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import TemplateView
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
@@ -22,6 +23,89 @@ class HomeView(TemplateView):
 
 class LoginView(TemplateView):
     template_name = "login.html"
+
+
+class AdminFrontendMixin(LoginRequiredMixin, UserPassesTestMixin):
+    login_url = "frontend-login"
+
+    def test_func(self):
+        user = self.request.user
+        return bool(user.is_authenticated and user.is_active and (user.is_staff or user.role == user.Role.ADMIN))
+
+
+class TraineeFrontendMixin(LoginRequiredMixin, UserPassesTestMixin):
+    login_url = "frontend-login"
+
+    def test_func(self):
+        user = self.request.user
+        return bool(user.is_authenticated and user.is_active and user.role == user.Role.TRAINEE)
+
+
+class AdminDashboardView(AdminFrontendMixin, TemplateView):
+    template_name = "app/dashboard.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        appointments = Appointment.objects.select_related("patient", "trainee", "trainee__user")
+        context.update(
+            {
+                "active_patients_count": Patient.objects.filter(active=True).count(),
+                "active_trainees_count": Trainee.objects.filter(active=True).count(),
+                "scheduled_appointments_count": appointments.filter(
+                    active=True,
+                    status=Appointment.Status.SCHEDULED,
+                ).count(),
+                "upcoming_appointments": appointments.filter(
+                    active=True,
+                    status=Appointment.Status.SCHEDULED,
+                    scheduled_at__gte=timezone.now(),
+                ).order_by("scheduled_at")[:5],
+            }
+        )
+        return context
+
+
+class AdminPatientsPageView(AdminFrontendMixin, TemplateView):
+    template_name = "app/patients.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["patients"] = Patient.objects.order_by("name")
+        return context
+
+
+class AdminTraineesPageView(AdminFrontendMixin, TemplateView):
+    template_name = "app/trainees.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["trainees"] = Trainee.objects.select_related("user").order_by("user__first_name", "user__last_name")
+        return context
+
+
+class AdminAppointmentsPageView(AdminFrontendMixin, TemplateView):
+    template_name = "app/appointments.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["appointments"] = Appointment.objects.select_related("patient", "trainee", "trainee__user").order_by(
+            "scheduled_at"
+        )
+        return context
+
+
+class TraineeAgendaPageView(TraineeFrontendMixin, TemplateView):
+    template_name = "app/agenda.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["appointments"] = Appointment.objects.select_related("patient", "trainee", "trainee__user").filter(
+            trainee__user=self.request.user,
+            scheduled_at__gte=timezone.now(),
+            status=Appointment.Status.SCHEDULED,
+            active=True,
+        )
+        return context
 
 
 class RoleTokenObtainPairView(TokenObtainPairView):

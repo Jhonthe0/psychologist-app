@@ -1,0 +1,59 @@
+{% extends "app/base_app.html" %}
+
+{% block title %}PsiLine | Painel clinico{% endblock %}
+
+{% block app_content %}
+<header class="page-heading">
+  <span class="eyebrow">Visao administrativa</span>
+  <h2>Painel clinico</h2>
+  <p>Acompanhe a ocupacao da agenda e os principais cadastros do atendimento remoto.</p>
+</header>
+
+<section class="dashboard-metrics" aria-label="Indicadores operacionais">
+  <article>
+    <span>Pacientes ativos</span>
+    <strong>{{ active_patients_count }}</strong>
+  </article>
+  <article>
+    <span>Estagiarios ativos</span>
+    <strong>{{ active_trainees_count }}</strong>
+  </article>
+  <article>
+    <span>Consultas agendadas</span>
+    <strong>{{ scheduled_appointments_count }}</strong>
+  </article>
+</section>
+
+<section class="clinical-section">
+  <div class="section-title">
+    <h3>Proximas consultas</h3>
+    <a href="{% url 'app-appointments' %}">Ver todas</a>
+  </div>
+  <div class="data-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Paciente</th>
+          <th>Estagiario</th>
+          <th>Horario</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for appointment in upcoming_appointments %}
+          <tr>
+            <td>{{ appointment.patient.name }}</td>
+            <td>{{ appointment.trainee.full_name }}</td>
+            <td>{{ appointment.scheduled_at|date:"d/m/Y H:i" }}</td>
+            <td><span class="status-badge">{{ appointment.get_status_display }}</span></td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="4">Nenhuma consulta futura agendada.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
