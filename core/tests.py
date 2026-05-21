@@ -15,22 +15,17 @@ class FrontendPageTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertContains(response, "PsiLine")
         self.assertContains(response, "Atendimento psicologico remoto")
+        self.assertContains(response, 'href="/app/"')
 
     def test_login_page_renders_entry_interface(self):
         response = self.client.get("/login/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertContains(response, "Acessar o sistema")
+        self.assertContains(response, "Demo do app")
         self.assertContains(response, "Django Admin")
 
     def test_admin_dashboard_renders_operational_metrics(self):
-        admin = get_user_model().objects.create_user(
-            username="admin",
-            email="admin@example.com",
-            password="StrongPass123!",
-            role=User.Role.ADMIN,
-            is_staff=True,
-        )
         patient = Patient.objects.create(
             name="Maria Silva",
             cpf="12345678900",
@@ -56,7 +51,6 @@ class FrontendPageTests(APITestCase):
             scheduled_at=timezone.now() + timedelta(days=1),
         )
 
-        self.client.force_login(admin)
         response = self.client.get("/app/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -65,13 +59,6 @@ class FrontendPageTests(APITestCase):
         self.assertContains(response, "Maria Silva")
 
     def test_admin_list_pages_render_registered_records(self):
-        admin = get_user_model().objects.create_user(
-            username="admin",
-            email="admin@example.com",
-            password="StrongPass123!",
-            role=User.Role.ADMIN,
-            is_staff=True,
-        )
         patient = Patient.objects.create(
             name="Maria Silva",
             cpf="12345678900",
@@ -96,8 +83,6 @@ class FrontendPageTests(APITestCase):
             trainee=trainee,
             scheduled_at=timezone.now() + timedelta(days=1),
         )
-
-        self.client.force_login(admin)
 
         patient_response = self.client.get("/app/patients/")
         trainee_response = self.client.get("/app/trainees/")
@@ -107,7 +92,7 @@ class FrontendPageTests(APITestCase):
         self.assertContains(trainee_response, "Joao")
         self.assertContains(appointment_response, "Agendada")
 
-    def test_trainee_agenda_page_only_renders_own_future_appointments(self):
+    def test_demo_agenda_page_renders_future_appointments_without_login(self):
         patient = Patient.objects.create(
             name="Maria Silva",
             cpf="12345678900",
@@ -155,13 +140,12 @@ class FrontendPageTests(APITestCase):
             scheduled_at=timezone.now() + timedelta(days=1),
         )
 
-        self.client.force_login(trainee_user)
         response = self.client.get("/app/agenda/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertContains(response, "Minha agenda")
         self.assertContains(response, "Maria Silva")
-        self.assertNotContains(response, "Ana Costa")
+        self.assertContains(response, "Ana Costa")
 
 
 class AdminApiTests(APITestCase):

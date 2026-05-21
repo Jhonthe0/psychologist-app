@@ -221,7 +221,7 @@ GET /app/appointments/ Consultas
 GET /app/agenda/   Agenda do estagiario
 ```
 
-As paginas de `/app/` exigem login por sessao do Django. O usuario admin acessa o painel administrativo; o estagiario acessa a propria agenda.
+Nesta primeira entrega, as paginas visuais de `/app/` ficam publicas para demonstracao do sistema sem login. O Django Admin e a API protegida continuam exigindo autenticacao.
 
 ## Endpoints administrativos
 

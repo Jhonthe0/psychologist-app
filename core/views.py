@@ -1,5 +1,4 @@
 from django.utils import timezone
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import TemplateView
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
@@ -25,23 +24,7 @@ class LoginView(TemplateView):
     template_name = "login.html"
 
 
-class AdminFrontendMixin(LoginRequiredMixin, UserPassesTestMixin):
-    login_url = "frontend-login"
-
-    def test_func(self):
-        user = self.request.user
-        return bool(user.is_authenticated and user.is_active and (user.is_staff or user.role == user.Role.ADMIN))
-
-
-class TraineeFrontendMixin(LoginRequiredMixin, UserPassesTestMixin):
-    login_url = "frontend-login"
-
-    def test_func(self):
-        user = self.request.user
-        return bool(user.is_authenticated and user.is_active and user.role == user.Role.TRAINEE)
-
-
-class AdminDashboardView(AdminFrontendMixin, TemplateView):
+class AdminDashboardView(TemplateView):
     template_name = "app/dashboard.html"
 
     def get_context_data(self, **kwargs):
@@ -65,7 +48,7 @@ class AdminDashboardView(AdminFrontendMixin, TemplateView):
         return context
 
 
-class AdminPatientsPageView(AdminFrontendMixin, TemplateView):
+class AdminPatientsPageView(TemplateView):
     template_name = "app/patients.html"
 
     def get_context_data(self, **kwargs):
@@ -74,7 +57,7 @@ class AdminPatientsPageView(AdminFrontendMixin, TemplateView):
         return context
 
 
-class AdminTraineesPageView(AdminFrontendMixin, TemplateView):
+class AdminTraineesPageView(TemplateView):
     template_name = "app/trainees.html"
 
     def get_context_data(self, **kwargs):
@@ -83,7 +66,7 @@ class AdminTraineesPageView(AdminFrontendMixin, TemplateView):
         return context
 
 
-class AdminAppointmentsPageView(AdminFrontendMixin, TemplateView):
+class AdminAppointmentsPageView(TemplateView):
     template_name = "app/appointments.html"
 
     def get_context_data(self, **kwargs):
@@ -94,17 +77,19 @@ class AdminAppointmentsPageView(AdminFrontendMixin, TemplateView):
         return context
 
 
-class TraineeAgendaPageView(TraineeFrontendMixin, TemplateView):
+class TraineeAgendaPageView(TemplateView):
     template_name = "app/agenda.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["appointments"] = Appointment.objects.select_related("patient", "trainee", "trainee__user").filter(
-            trainee__user=self.request.user,
+        appointments = Appointment.objects.select_related("patient", "trainee", "trainee__user").filter(
             scheduled_at__gte=timezone.now(),
             status=Appointment.Status.SCHEDULED,
             active=True,
         )
+        if self.request.user.is_authenticated:
+            appointments = appointments.filter(trainee__user=self.request.user)
+        context["appointments"] = appointments
         return context
 
 
