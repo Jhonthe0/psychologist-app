@@ -1,15 +1,21 @@
-# PsiLine API
+# PsiLine
 
-Backend Django para gerenciamento de atendimentos psicologicos remotos do projeto PsiLine.
+Sistema Django para gerenciamento de atendimentos psicologicos remotos em uma clinica escola.
 
-Nesta etapa o projeto entrega:
+O projeto entrega uma API REST protegida por JWT, um Django Admin para operacao interna e telas HTML feitas com templates Django para apresentar uma interface inicial com aparencia clinica/hospitalar.
+
+## Funcionalidades
 
 - Docker com Django e PostgreSQL.
-- Django Admin protegido por login e senha.
-- API protegida por JWT.
-- Tabelas principais: usuarios, pacientes, estagiarios e consultas.
-- Endpoints administrativos para pacientes, estagiarios, consultas e relatorios.
-- Endpoints iniciais do ambiente do estagiario para agenda e atualizacao do link da reuniao.
+- Django Admin protegido por usuario e senha.
+- API REST com autenticacao JWT.
+- Front-end Django com home, tela de entrada, painel clinico, listagens e agenda.
+- Cadastro de usuarios com papel `admin`, `trainee` ou `patient`.
+- Cadastro e gerenciamento de pacientes.
+- Cadastro e gerenciamento de estagiarios.
+- Cadastro, listagem e cancelamento de consultas.
+- Relatorios por estagiario, paciente e periodo.
+- Agenda do estagiario com atualizacao do link da reuniao.
 
 ## Stack
 
@@ -19,32 +25,55 @@ Nesta etapa o projeto entrega:
 - Simple JWT
 - PostgreSQL 16
 - Docker Compose
+- HTML e CSS com templates Django
 
 ## Como subir o projeto
+
+Crie o arquivo `.env` a partir do exemplo:
+
+```bash
+cp .env.example .env
+```
+
+Suba os containers:
 
 ```bash
 docker compose up --build
 ```
 
-A API ficara disponivel em:
+Se sua instalacao usar o Compose antigo, rode:
 
-```text
-http://localhost:8000
+```bash
+docker-compose up --build
 ```
 
 O container executa as migrations automaticamente ao iniciar.
 
-## Criar administrador
+## Acessos principais
 
-Em outro terminal:
+Front-end publico:
 
-```bash
-docker compose exec web python manage.py createsuperuser
+```text
+http://localhost:8000/
 ```
 
-O superusuario tambem recebe o papel `admin` automaticamente.
+Tela de entrada:
 
-## Acessos
+```text
+http://localhost:8000/login/
+```
+
+Painel clinico:
+
+```text
+http://localhost:8000/app/
+```
+
+Agenda do estagiario:
+
+```text
+http://localhost:8000/app/agenda/
+```
 
 Django Admin:
 
@@ -56,6 +85,37 @@ API:
 
 ```text
 http://localhost:8000/api/
+```
+
+## Criar administrador
+
+Em outro terminal, com os containers rodando:
+
+```bash
+docker compose exec web python manage.py createsuperuser
+```
+
+Ou, se estiver usando o Compose antigo:
+
+```bash
+docker-compose exec web python manage.py createsuperuser
+```
+
+O superusuario recebe automaticamente o papel `admin`.
+
+## Criar admin de desenvolvimento rapidamente
+
+Opcionalmente, crie um usuario admin padrao para testes:
+
+```bash
+docker compose exec web python manage.py shell -c "from django.contrib.auth import get_user_model; User=get_user_model(); user, created=User.objects.get_or_create(username='admin', defaults={'email':'admin@example.com'}); user.email='admin@example.com'; user.is_staff=True; user.is_superuser=True; user.is_active=True; user.role='admin'; user.set_password('Admin123!'); user.save(); print('created' if created else 'updated')"
+```
+
+Acesso:
+
+```text
+Usuario: admin
+Senha: Admin123!
 ```
 
 ## Autenticacao JWT
@@ -99,7 +159,7 @@ Campos principais:
 
 ### Patient
 
-Paciente atendido no sistema. Na primeira versao do requisito, o paciente nao acessa diretamente o sistema, mas o relacionamento opcional com `User` ja permite evoluir para login de paciente depois.
+Paciente atendido no sistema.
 
 Campos principais:
 
@@ -140,14 +200,28 @@ Campos principais:
 - `created_at`
 - `updated_at`
 
-Regras implementadas:
+## Regras de negocio
 
 - Nao agenda consulta para paciente inativo.
 - Nao agenda consulta para estagiario inativo.
 - Nao permite duas consultas agendadas para o mesmo estagiario no mesmo horario.
-- Exclusao de paciente e estagiario e logica (`active=false`).
+- Exclusao de paciente e estagiario e logica, usando `active=false`.
 - Nao inativa paciente ou estagiario com consulta futura agendada.
-- Cancelamento de consulta altera status para `canceled` e remove da listagem padrao.
+- Cancelamento de consulta altera o status para `canceled`.
+
+## Telas do front-end
+
+```text
+GET /              Home publica
+GET /login/        Tela visual de entrada
+GET /app/          Painel clinico administrativo
+GET /app/patients/ Pacientes
+GET /app/trainees/ Estagiarios
+GET /app/appointments/ Consultas
+GET /app/agenda/   Agenda do estagiario
+```
+
+As paginas de `/app/` exigem login por sessao do Django. O usuario admin acessa o painel administrativo; o estagiario acessa a propria agenda.
 
 ## Endpoints administrativos
 
@@ -164,18 +238,7 @@ PATCH  /api/admin/patients/{id}/
 DELETE /api/admin/patients/{id}/
 ```
 
-Exemplo de cadastro:
-
-```json
-{
-  "name": "Maria Silva",
-  "cpf": "12345678900",
-  "email": "maria@example.com",
-  "phone": "35999999999"
-}
-```
-
-Use `?include_inactive=true` para listar tambem registros inativos.
+Use `?include_inactive=true` para listar registros inativos.
 
 ### Estagiarios
 
@@ -186,18 +249,6 @@ GET    /api/admin/trainees/{id}/
 PUT    /api/admin/trainees/{id}/
 PATCH  /api/admin/trainees/{id}/
 DELETE /api/admin/trainees/{id}/
-```
-
-Exemplo de cadastro:
-
-```json
-{
-  "name": "Joao Pereira",
-  "email": "joao@example.com",
-  "registration_number": "20250001",
-  "phone": "35988888888",
-  "password": "SenhaForte123"
-}
 ```
 
 O login do estagiario usa a matricula como `username`.
@@ -214,18 +265,6 @@ DELETE /api/admin/appointments/{id}/
 POST   /api/admin/appointments/{id}/cancel/
 ```
 
-Exemplo de agendamento:
-
-```json
-{
-  "trainee": 1,
-  "patient": 1,
-  "scheduled_at": "2026-05-20T14:00:00-03:00",
-  "call_link": "https://meet.example.com/abc",
-  "status": "scheduled"
-}
-```
-
 ### Relatorios
 
 ```text
@@ -233,8 +272,6 @@ GET /api/admin/reports/by-trainee/?trainee_id=1
 GET /api/admin/reports/by-patient/?patient_id=1
 GET /api/admin/reports/by-period/?start_date=2026-05-01T00:00:00-03:00&end_date=2026-05-31T23:59:59-03:00
 ```
-
-Os relatorios retornam JSON com as consultas encontradas. Exportacao PDF/CSV ficou preparada como evolucao futura, pois neste momento o pedido foi para tabelas e endpoints.
 
 ## Endpoints do estagiario
 
@@ -256,7 +293,7 @@ Atualizar link da reuniao:
 
 ## Variaveis de ambiente
 
-O projeto ja inclui `.env` para desenvolvimento local. Para outro ambiente, copie `.env.example` e ajuste:
+Copie `.env.example` para `.env` e ajuste se necessario:
 
 ```text
 DEBUG
@@ -268,6 +305,20 @@ POSTGRES_USER
 POSTGRES_PASSWORD
 POSTGRES_HOST
 POSTGRES_PORT
+```
+
+## Testes
+
+Rodar testes dentro do container:
+
+```bash
+docker compose exec web python manage.py test
+```
+
+Ou:
+
+```bash
+docker-compose exec web python manage.py test
 ```
 
 ## Comandos uteis
