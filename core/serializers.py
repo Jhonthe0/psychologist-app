@@ -33,6 +33,7 @@ class PatientSerializer(serializers.ModelSerializer):
             "cpf",
             "email",
             "phone",
+            "birth_date",
             "active",
             "created_at",
             "updated_at",
@@ -55,6 +56,7 @@ class TraineeSerializer(serializers.ModelSerializer):
             "email",
             "registration_number",
             "phone",
+            "supervisor_name",
             "password",
             "active",
             "created_at",
@@ -138,6 +140,7 @@ class AppointmentSerializer(serializers.ModelSerializer):
             "scheduled_at",
             "call_link",
             "status",
+            "cancellation_reason",
             "active",
             "created_at",
             "updated_at",
@@ -150,6 +153,10 @@ class AppointmentSerializer(serializers.ModelSerializer):
         trainee = attrs.get("trainee", getattr(instance, "trainee", None))
         scheduled_at = attrs.get("scheduled_at", getattr(instance, "scheduled_at", None))
         status = attrs.get("status", getattr(instance, "status", Appointment.Status.SCHEDULED))
+        cancellation_reason = attrs.get(
+            "cancellation_reason",
+            getattr(instance, "cancellation_reason", ""),
+        )
 
         if patient and not patient.active:
             raise serializers.ValidationError({"patient": "Paciente inativo nao pode receber consulta."})
@@ -168,6 +175,10 @@ class AppointmentSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     {"scheduled_at": "Ja existe consulta agendada para este estagiario neste horario."}
                 )
+        if cancellation_reason and status != Appointment.Status.CANCELED:
+            raise serializers.ValidationError(
+                {"cancellation_reason": "Motivo de cancelamento so deve ser informado em consultas canceladas."}
+            )
         return attrs
 
 

@@ -173,9 +173,16 @@ class AdminAppointmentViewSet(viewsets.ModelViewSet):
                 {"detail": "Somente consultas agendadas podem ser canceladas."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+        cancellation_reason = request.data.get("cancellation_reason", "")
+        if cancellation_reason and cancellation_reason not in Appointment.CancellationReason.values:
+            return Response(
+                {"cancellation_reason": "Motivo de cancelamento invalido."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         appointment.status = Appointment.Status.CANCELED
+        appointment.cancellation_reason = cancellation_reason
         appointment.active = False
-        appointment.save(update_fields=["status", "active", "updated_at"])
+        appointment.save(update_fields=["status", "cancellation_reason", "active", "updated_at"])
         return Response(self.get_serializer(appointment).data)
 
 

@@ -321,6 +321,35 @@ Ou:
 docker-compose exec web python manage.py test
 ```
 
+## Dados demo
+
+Para popular o banco com pacientes, estagiarios e consultas suficientes para testar agenda e relatorios:
+
+```bash
+docker compose exec web python manage.py seed_demo_data
+```
+
+O comando e idempotente: pode rodar mais de uma vez sem duplicar os registros demo.
+
+Para limpar apenas os dados demo conhecidos e recriar:
+
+```bash
+docker compose exec web python manage.py seed_demo_data --reset-demo
+```
+
+Ele cria:
+
+- 12 pacientes demo com data de nascimento.
+- 5 estagiarios demo com supervisor.
+- 60 consultas distribuidas entre `scheduled`, `completed` e `canceled`.
+- Motivos de cancelamento em consultas canceladas.
+
+Senha dos estagiarios demo:
+
+```text
+Demo123456
+```
+
 ## Comandos uteis
 
 Rodar migrations:

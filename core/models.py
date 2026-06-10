@@ -32,6 +32,7 @@ class Patient(models.Model):
     cpf = models.CharField(max_length=14, unique=True)
     email = models.EmailField(unique=True)
     phone = models.CharField(max_length=20)
+    birth_date = models.DateField(null=True, blank=True)
     active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -58,6 +59,7 @@ class Trainee(models.Model):
     )
     registration_number = models.CharField(max_length=50, unique=True)
     phone = models.CharField(max_length=20)
+    supervisor_name = models.CharField(max_length=255, blank=True)
     active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -90,6 +92,15 @@ class Appointment(models.Model):
         COMPLETED = "completed", "Realizada"
         CANCELED = "canceled", "Cancelada"
 
+    class CancellationReason(models.TextChoices):
+        PATIENT_ABSENCE = "patient_absence", "Ausencia do paciente"
+        TRAINEE_ABSENCE = "trainee_absence", "Ausencia do estagiario"
+        PATIENT_REQUEST = "patient_request", "Solicitacao do paciente"
+        TRAINEE_REQUEST = "trainee_request", "Solicitacao do estagiario"
+        TECHNICAL_ISSUE = "technical_issue", "Problema tecnico"
+        RESCHEDULED = "rescheduled", "Reagendada"
+        OTHER = "other", "Outro"
+
     trainee = models.ForeignKey(
         Trainee,
         on_delete=models.PROTECT,
@@ -106,6 +117,11 @@ class Appointment(models.Model):
         max_length=20,
         choices=Status.choices,
         default=Status.SCHEDULED,
+    )
+    cancellation_reason = models.CharField(
+        max_length=30,
+        choices=CancellationReason.choices,
+        blank=True,
     )
     active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -136,7 +152,11 @@ class Appointment(models.Model):
             conflict = conflict.exclude(pk=self.pk)
         if self.status == self.Status.SCHEDULED and conflict.exists():
             raise ValidationError({"scheduled_at": "Ja existe consulta agendada para este estagiario neste horario."})
+        if self.cancellation_reason and self.status != self.Status.CANCELED:
+            raise ValidationError({"cancellation_reason": "Motivo de cancelamento so deve ser informado em consultas canceladas."})
 
     def save(self, *args, **kwargs):
+        if self.status != self.Status.CANCELED:
+            self.cancellation_reason = ""
         self.full_clean()
         super().save(*args, **kwargs)

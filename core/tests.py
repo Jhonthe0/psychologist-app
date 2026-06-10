@@ -1,6 +1,7 @@
 from datetime import timedelta
 
 from django.contrib.auth import get_user_model
+from django.core.management import call_command
 from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -273,3 +274,17 @@ class TraineeApiTests(APITestCase):
         self.assertEqual(link_response.status_code, status.HTTP_200_OK)
         appointment.refresh_from_db()
         self.assertEqual(appointment.call_link, "https://meet.example.com/new")
+
+
+class SeedDemoDataCommandTests(APITestCase):
+    def test_seed_demo_data_creates_reportable_records_and_is_idempotent(self):
+        call_command("seed_demo_data")
+        call_command("seed_demo_data")
+
+        self.assertEqual(Patient.objects.filter(cpf__startswith="900000000").count(), 12)
+        self.assertEqual(Trainee.objects.filter(registration_number__startswith="DEMO").count(), 5)
+        self.assertEqual(Appointment.objects.count(), 60)
+        self.assertTrue(Appointment.objects.filter(status=Appointment.Status.COMPLETED).exists())
+        self.assertTrue(Appointment.objects.filter(status=Appointment.Status.SCHEDULED).exists())
+        self.assertTrue(Appointment.objects.filter(status=Appointment.Status.CANCELED).exists())
+        self.assertTrue(Appointment.objects.exclude(cancellation_reason="").exists())
