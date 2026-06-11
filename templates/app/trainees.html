@@ -1,4 +1,5 @@
 {% extends "app/base_app.html" %}
+{% load formatters %}
 
 {% block title %}PsiLine | Estagiarios{% endblock %}
 
@@ -10,6 +11,44 @@
 </header>
 
 <section class="clinical-section">
+  <div class="section-title">
+    <div>
+      <h3>Lista de estagiarios</h3>
+      <p>{{ trainees|length }} registros encontrados</p>
+    </div>
+  </div>
+
+  <form class="table-filters" method="get" aria-label="Filtros de estagiarios">
+    <label>
+      Nome
+      <input type="search" name="name" value="{{ trainee_filters.name }}" placeholder="Buscar por nome">
+    </label>
+    <label>
+      Matricula
+      <input type="search" name="registration_number" value="{{ trainee_filters.registration_number }}" placeholder="20250001">
+    </label>
+    <label>
+      Email
+      <input type="search" name="email" value="{{ trainee_filters.email }}" placeholder="estagiario@email.com">
+    </label>
+    <label>
+      Telefone
+      <input type="search" name="phone" value="{{ trainee_filters.phone }}" placeholder="(35) 99999-9999">
+    </label>
+    <label>
+      Status
+      <select name="status">
+        <option value="" {% if not trainee_filters.status %}selected{% endif %}>Todos</option>
+        <option value="active" {% if trainee_filters.status == "active" %}selected{% endif %}>Ativos</option>
+        <option value="inactive" {% if trainee_filters.status == "inactive" %}selected{% endif %}>Inativos</option>
+      </select>
+    </label>
+    <div class="filter-actions">
+      <button class="primary-action" type="submit">Filtrar</button>
+      <a class="secondary-action" href="{% url 'app-trainees' %}">Limpar</a>
+    </div>
+  </form>
+
   <div class="data-table">
     <table>
       <thead>
@@ -27,7 +66,7 @@
             <td>{{ trainee.full_name }}</td>
             <td>{{ trainee.registration_number }}</td>
             <td>{{ trainee.email }}</td>
-            <td>{{ trainee.phone }}</td>
+            <td>{{ trainee.phone|phone_mask }}</td>
             <td><span class="status-badge">{{ trainee.active|yesno:"Ativo,Inativo" }}</span></td>
           </tr>
         {% empty %}

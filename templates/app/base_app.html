@@ -3,19 +3,55 @@
 {% block content %}
 <section class="app-shell">
   <aside class="app-sidebar" aria-label="Navegacao do sistema">
-    <span class="eyebrow">Operacao clinica</span>
-    <h1>PsiLine</h1>
-    <nav>
-      {% if not request.user.is_authenticated or request.user.is_staff or request.user.role == "admin" %}
-        <a href="{% url 'app-dashboard' %}">Painel</a>
-        <a href="{% url 'app-patients' %}">Pacientes</a>
-        <a href="{% url 'app-trainees' %}">Estagiarios</a>
-        <a href="{% url 'app-appointments' %}">Consultas</a>
+    <div class="sidebar-head">
+      <span class="eyebrow">Operacao clinica</span>
+      <h1>PsiLine</h1>
+    </div>
+
+    <div class="sidebar-user">
+      <span class="user-avatar">{{ request.user.username|first|upper }}</span>
+      <span>
+        <strong>{{ request.user.get_full_name|default:request.user.username }}</strong>
+        <small>{{ request.user.get_role_display }}</small>
+      </span>
+    </div>
+
+    <nav class="sidebar-nav">
+      {% if request.user.is_staff or request.user.role == "admin" %}
+        <a class="{% if request.resolver_match.url_name == 'app-dashboard' %}is-active{% endif %}" href="{% url 'app-dashboard' %}">
+          <span>Painel</span>
+          <small>Indicadores</small>
+        </a>
+        <a class="{% if request.resolver_match.url_name == 'app-patients' %}is-active{% endif %}" href="{% url 'app-patients' %}">
+          <span>Pacientes</span>
+          <small>Cadastro assistencial</small>
+        </a>
+        <a class="{% if request.resolver_match.url_name == 'app-trainees' %}is-active{% endif %}" href="{% url 'app-trainees' %}">
+          <span>Estagiarios</span>
+          <small>Equipe clinica</small>
+        </a>
+        <a class="{% if request.resolver_match.url_name == 'app-appointments' %}is-active{% endif %}" href="{% url 'app-appointments' %}">
+          <span>Consultas</span>
+          <small>Agenda institucional</small>
+        </a>
       {% endif %}
-      {% if not request.user.is_authenticated or request.user.role == "trainee" %}
-        <a href="{% url 'app-agenda' %}">Minha agenda</a>
+      {% if request.user.role == "trainee" %}
+        <a class="{% if request.resolver_match.url_name == 'app-agenda' %}is-active{% endif %}" href="{% url 'app-agenda' %}">
+          <span>Minha agenda</span>
+          <small>Atendimentos futuros</small>
+        </a>
       {% endif %}
     </nav>
+
+    <div class="sidebar-footer">
+      {% if request.user.is_staff or request.user.role == "admin" %}
+        <a href="/admin/">Django Admin</a>
+      {% endif %}
+      <form action="{% url 'frontend-logout' %}" method="post">
+        {% csrf_token %}
+        <button type="submit">Sair</button>
+      </form>
+    </div>
   </aside>
 
   <div class="app-main">

@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=20260611-auth">
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=20260611-filter-fix">
 </head>
 <body>
   <header class="site-header">
@@ -21,10 +21,32 @@
     </a>
     <nav class="top-nav" aria-label="Navegacao principal">
       <a href="{% url 'home' %}">Inicio</a>
-      <a href="{% url 'app-dashboard' %}">Painel</a>
+      {% if request.user.is_authenticated %}
+        {% if request.user.role == "trainee" and not request.user.is_staff %}
+          <a href="{% url 'app-agenda' %}">Painel</a>
+        {% else %}
+          <a href="{% url 'app-dashboard' %}">Painel</a>
+        {% endif %}
+      {% endif %}
       <a href="/api/">API</a>
-      <a href="/admin/">Admin</a>
-      <a class="nav-button" href="{% url 'frontend-login' %}">Entrar</a>
+      {% if request.user.is_staff or request.user.role == "admin" %}
+        <a href="/admin/">Admin</a>
+      {% endif %}
+      {% if request.user.is_authenticated %}
+        <div class="top-user">
+          <span class="user-avatar">{{ request.user.username|first|upper }}</span>
+          <span class="user-meta">
+            <strong>{{ request.user.get_full_name|default:request.user.username }}</strong>
+            <small>{{ request.user.get_role_display }}</small>
+          </span>
+          <form action="{% url 'frontend-logout' %}" method="post">
+            {% csrf_token %}
+            <button type="submit">Sair</button>
+          </form>
+        </div>
+      {% else %}
+        <a class="nav-button" href="{% url 'frontend-login' %}">Entrar</a>
+      {% endif %}
     </nav>
   </header>
 

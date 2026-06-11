@@ -23,12 +23,20 @@
   </div>
 
   <div class="auth-card">
-    <form class="auth-form" action="{% url 'token_obtain_pair' %}" method="post">
+    <form class="auth-form" action="{% url 'frontend-login' %}" method="post">
       {% csrf_token %}
       <header>
         <h2>Entrar</h2>
         <p>Use suas credenciais para acessar o ambiente correto.</p>
       </header>
+
+      {% if messages %}
+        <div class="form-messages" role="alert">
+          {% for message in messages %}
+            <p>{{ message }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
 
       <div class="field-grid">
         <label>
@@ -51,7 +59,6 @@
       <button class="primary-action auth-submit" type="submit">Entrar</button>
       <div class="auth-links">
         <a href="/admin/">Acessar Django Admin</a>
-        <a href="{% url 'app-dashboard' %}">Ver demo</a>
       </div>
     </form>
   </div>

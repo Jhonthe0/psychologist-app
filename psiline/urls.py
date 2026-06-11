@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.urls import include, path
+from django.contrib.auth.views import LogoutView
 from rest_framework_simplejwt.views import TokenRefreshView
 
 from core.views import (
@@ -16,6 +17,7 @@ from core.views import (
 urlpatterns = [
     path("", HomeView.as_view(), name="home"),
     path("login/", LoginView.as_view(), name="frontend-login"),
+    path("logout/", LogoutView.as_view(next_page="frontend-login"), name="frontend-logout"),
     path("app/", AdminDashboardView.as_view(), name="app-dashboard"),
     path("app/patients/", AdminPatientsPageView.as_view(), name="app-patients"),
     path("app/trainees/", AdminTraineesPageView.as_view(), name="app-trainees"),

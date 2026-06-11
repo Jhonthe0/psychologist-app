@@ -10,6 +10,45 @@
 </header>
 
 <section class="clinical-section">
+  <div class="section-title">
+    <div>
+      <h3>Lista de consultas</h3>
+      <p>{{ appointments|length }} registros encontrados</p>
+    </div>
+  </div>
+
+  <form class="table-filters appointments-filters" method="get" aria-label="Filtros de consultas">
+    <label>
+      Data inicial
+      <input type="date" name="start_date" value="{{ appointment_filters.start_date }}">
+    </label>
+    <label>
+      Data final
+      <input type="date" name="end_date" value="{{ appointment_filters.end_date }}">
+    </label>
+    <label>
+      Paciente
+      <input type="search" name="patient" value="{{ appointment_filters.patient }}" placeholder="Nome do paciente">
+    </label>
+    <label>
+      Estagiario
+      <input type="search" name="trainee" value="{{ appointment_filters.trainee }}" placeholder="Nome ou matricula">
+    </label>
+    <label>
+      Status
+      <select name="status">
+        <option value="" {% if not appointment_filters.status %}selected{% endif %}>Todos</option>
+        {% for value, label in appointment_statuses %}
+          <option value="{{ value }}" {% if appointment_filters.status == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <div class="filter-actions">
+      <button class="primary-action" type="submit">Filtrar</button>
+      <a class="secondary-action" href="{% url 'app-appointments' %}">Limpar</a>
+    </div>
+  </form>
+
   <div class="data-table">
     <table>
       <thead>
@@ -34,7 +73,7 @@
                 Aguardando link
               {% endif %}
             </td>
-            <td><span class="status-badge">{{ appointment.get_status_display }}</span></td>
+            <td><span class="status-badge status-{{ appointment.status }}">{{ appointment.get_status_display }}</span></td>
           </tr>
         {% empty %}
           <tr>

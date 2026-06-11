@@ -9,6 +9,21 @@
   <p>Acompanhe a ocupacao da agenda e os principais cadastros do atendimento remoto.</p>
 </header>
 
+<section class="dashboard-toolbar" aria-label="Filtros do painel">
+  <form method="get" class="date-filter">
+    <label>
+      Inicio
+      <input type="date" name="start_date" value="{{ start_date|date:'Y-m-d' }}">
+    </label>
+    <label>
+      Fim
+      <input type="date" name="end_date" value="{{ end_date|date:'Y-m-d' }}">
+    </label>
+    <button class="primary-action" type="submit">Filtrar</button>
+  </form>
+  <span class="period-summary">{{ start_date|date:"d/m/Y" }} a {{ end_date|date:"d/m/Y" }}</span>
+</section>
+
 <section class="dashboard-metrics" aria-label="Indicadores operacionais">
   <article>
     <span>Pacientes ativos</span>
@@ -21,6 +36,64 @@
   <article>
     <span>Consultas agendadas</span>
     <strong>{{ scheduled_appointments_count }}</strong>
+  </article>
+  <article>
+    <span>Consultas no periodo</span>
+    <strong>{{ total_period_appointments }}</strong>
+  </article>
+</section>
+
+<section class="dashboard-insights" aria-label="Analise das consultas">
+  <article class="chart-card">
+    <div class="section-title">
+      <div>
+        <h3>Status das consultas</h3>
+        <p>Distribuicao no periodo filtrado</p>
+      </div>
+    </div>
+    <div class="chart-layout">
+      <div class="chart-pie" style="background: conic-gradient({{ status_chart.gradient }});">
+        <span>{{ total_period_appointments }}</span>
+      </div>
+      <div class="chart-legend">
+        <div>
+          <span class="legend-dot scheduled"></span>
+          <strong>Agendadas</strong>
+          <small>{{ period_scheduled_count }} consultas · {{ status_chart.scheduled_percent }}%</small>
+        </div>
+        <div>
+          <span class="legend-dot completed"></span>
+          <strong>Realizadas</strong>
+          <small>{{ period_completed_count }} consultas · {{ status_chart.completed_percent }}%</small>
+        </div>
+        <div>
+          <span class="legend-dot canceled"></span>
+          <strong>Canceladas</strong>
+          <small>{{ period_canceled_count }} consultas · {{ status_chart.canceled_percent }}%</small>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <article class="chart-card">
+    <div class="section-title">
+      <div>
+        <h3>Volume por dia</h3>
+        <p>Primeiros dias com movimento no periodo</p>
+      </div>
+      <span class="status-badge status-canceled">{{ cancellation_rate }}% canceladas</span>
+    </div>
+    <div class="bar-list">
+      {% for item in daily_distribution %}
+        <div class="bar-row">
+          <span>{{ item.day|date:"d/m" }}</span>
+          <div><i style="width: {{ item.percent }}%;"></i></div>
+          <strong>{{ item.total }}</strong>
+        </div>
+      {% empty %}
+        <p class="empty-state">Nenhuma consulta encontrada no periodo.</p>
+      {% endfor %}
+    </div>
   </article>
 </section>
 

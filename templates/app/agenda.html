@@ -1,4 +1,5 @@
 {% extends "app/base_app.html" %}
+{% load formatters %}
 
 {% block title %}PsiLine | Minha agenda{% endblock %}
 
@@ -10,6 +11,12 @@
 </header>
 
 <section class="clinical-section">
+  <div class="section-title">
+    <div>
+      <h3>Proximos atendimentos</h3>
+      <p>{{ appointments|length }} consultas vinculadas ao seu usuario</p>
+    </div>
+  </div>
   <div class="data-table">
     <table>
       <thead>
@@ -25,7 +32,7 @@
           <tr>
             <td>{{ appointment.scheduled_at|date:"d/m/Y H:i" }}</td>
             <td>{{ appointment.patient.name }}</td>
-            <td>{{ appointment.patient.phone }}</td>
+            <td>{{ appointment.patient.phone|phone_mask }}</td>
             <td>
               {% if appointment.call_link %}
                 <a href="{{ appointment.call_link }}">Abrir sala</a>

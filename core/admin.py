@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
+from core.formatters import format_cpf, format_phone
 from core.models import Appointment, Patient, Trainee, User
 
 
@@ -25,18 +26,30 @@ class CustomUserAdmin(UserAdmin):
 
 @admin.register(Patient)
 class PatientAdmin(admin.ModelAdmin):
-    list_display = ("name", "cpf", "email", "phone", "birth_date", "active")
+    list_display = ("name", "formatted_cpf", "email", "formatted_phone", "birth_date", "active")
     list_filter = ("active",)
     search_fields = ("name", "cpf", "email")
     list_per_page = 25
 
+    @admin.display(description="CPF", ordering="cpf")
+    def formatted_cpf(self, obj):
+        return format_cpf(obj.cpf)
+
+    @admin.display(description="Telefone", ordering="phone")
+    def formatted_phone(self, obj):
+        return format_phone(obj.phone)
+
 
 @admin.register(Trainee)
 class TraineeAdmin(admin.ModelAdmin):
-    list_display = ("full_name", "registration_number", "email", "phone", "supervisor_name", "active")
+    list_display = ("full_name", "registration_number", "email", "formatted_phone", "supervisor_name", "active")
     list_filter = ("active",)
     search_fields = ("user__first_name", "user__last_name", "user__email", "registration_number", "supervisor_name")
     list_per_page = 25
+
+    @admin.display(description="Telefone", ordering="phone")
+    def formatted_phone(self, obj):
+        return format_phone(obj.phone)
 
 
 @admin.register(Appointment)
