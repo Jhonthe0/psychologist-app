@@ -1,0 +1,54 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="psiline-admin-home">
+  <section class="psiline-admin-hero">
+    <span class="eyebrow">Operacao clinica</span>
+    <h1>Administracao PsiLine</h1>
+    <p>Gerencie pacientes, estagiarios, usuarios e consultas em um painel direto, alinhado ao fluxo da clinica escola.</p>
+  </section>
+
+  <section class="psiline-admin-grid" aria-label="Modulos administrativos">
+    {% if app_list %}
+      {% for app in app_list %}
+        <article class="psiline-admin-module app-{{ app.app_label }}">
+          <header>
+            <span class="module-kicker">Modulo</span>
+            <h2>{{ app.name }}</h2>
+          </header>
+
+          <div class="module-models">
+            {% for model in app.models %}
+              <div class="module-row">
+                {% if model.admin_url %}
+                  <a class="module-name" href="{{ model.admin_url }}">{{ model.name }}</a>
+                {% else %}
+                  <span class="module-name">{{ model.name }}</span>
+                {% endif %}
+                <div class="module-actions">
+                  {% if model.add_url %}
+                    <a href="{{ model.add_url }}">Adicionar</a>
+                  {% endif %}
+                  {% if model.admin_url and model.view_only %}
+                    <a href="{{ model.admin_url }}">Visualizar</a>
+                  {% elif model.admin_url %}
+                    <a href="{{ model.admin_url }}">Gerenciar</a>
+                  {% endif %}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </article>
+      {% endfor %}
+    {% else %}
+      <article class="psiline-admin-module">
+        <h2>Nenhum modulo disponivel</h2>
+        <p>Seu usuario nao possui permissoes administrativas para os cadastros do sistema.</p>
+      </article>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}
+
+{% block sidebar %}{% endblock %}

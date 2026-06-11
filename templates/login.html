@@ -3,34 +3,57 @@
 {% block title %}PsiLine | Entrar{% endblock %}
 
 {% block content %}
-<section class="login-shell">
-  <div class="login-card">
+<section class="auth-shell">
+  <div class="auth-copy">
     <span class="eyebrow">Entrada segura</span>
-    <h1>Acessar o sistema</h1>
+    <h1>Acesso PsiLine</h1>
     <p>
-      Nesta etapa, o acesso operacional usa o Django Admin e a API autenticada.
-      A tela visual de login fica pronta para receber o fluxo completo no proximo commit.
+      Uma entrada unica para professores acompanharem a operacao clinica e estudantes consultarem a propria agenda.
     </p>
-
-    <div class="access-list">
-      <a href="{% url 'app-dashboard' %}">
-        <span>Demo do app</span>
-        <strong>Visualizar painel, pacientes, estagiarios e consultas</strong>
-      </a>
-      <a href="/admin/">
-        <span>Django Admin</span>
-        <strong>Gerenciar pacientes, estagiarios e consultas</strong>
-      </a>
-      <a href="/api/auth/token/">
-        <span>Token JWT</span>
-        <strong>Autenticar clientes da API</strong>
-      </a>
+    <div class="auth-benefits" aria-label="Perfis de acesso">
+      <div>
+        <strong>Professor</strong>
+        <span>Gerencia cadastros, consultas, relatorios e acompanhamento da clinica escola.</span>
+      </div>
+      <div>
+        <strong>Estudante</strong>
+        <span>Acessa agenda de atendimentos e atualiza informacoes operacionais permitidas.</span>
+      </div>
     </div>
   </div>
 
-  <aside class="care-note">
-    <strong>PsiLine</strong>
-    <p>Interface institucional para rotinas de cuidado psicologico remoto.</p>
-  </aside>
+  <div class="auth-card">
+    <form class="auth-form" action="{% url 'token_obtain_pair' %}" method="post">
+      {% csrf_token %}
+      <header>
+        <h2>Entrar</h2>
+        <p>Use suas credenciais para acessar o ambiente correto.</p>
+      </header>
+
+      <div class="field-grid">
+        <label>
+          Perfil
+          <select name="role_hint" aria-label="Perfil de acesso">
+            <option value="admin">Professor</option>
+            <option value="trainee">Estudante</option>
+          </select>
+        </label>
+        <label>
+          Usuario
+          <input type="text" name="username" autocomplete="username" required>
+        </label>
+        <label>
+          Senha
+          <input type="password" name="password" autocomplete="current-password" required>
+        </label>
+      </div>
+
+      <button class="primary-action auth-submit" type="submit">Entrar</button>
+      <div class="auth-links">
+        <a href="/admin/">Acessar Django Admin</a>
+        <a href="{% url 'app-dashboard' %}">Ver demo</a>
+      </div>
+    </form>
+  </div>
 </section>
 {% endblock %}

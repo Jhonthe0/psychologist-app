@@ -22,9 +22,13 @@ class FrontendPageTests(APITestCase):
         response = self.client.get("/login/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertContains(response, "Acessar o sistema")
-        self.assertContains(response, "Demo do app")
-        self.assertContains(response, "Django Admin")
+        self.assertContains(response, "Acesso PsiLine")
+        self.assertContains(response, "Entrar")
+        self.assertContains(response, 'name="username"')
+        self.assertContains(response, 'name="password"')
+        self.assertNotContains(response, "Registrar estudante")
+        self.assertNotContains(response, 'name="registration_number"')
+        self.assertNotContains(response, 'name="phone"')
 
     def test_admin_dashboard_renders_operational_metrics(self):
         patient = Patient.objects.create(
